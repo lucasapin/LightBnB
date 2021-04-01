@@ -84,12 +84,12 @@ const getAllProperties = function (options, limit = 10) {
   }
 
   if (options.minimum_price_per_night) {
-    queryParams.push(`${options.minimum_price_per_night}`);
+    queryParams.push(`${options.minimum_price_per_night}` * 100);
     queryString += `AND properties.cost_per_night >= $${queryParams.length} `;
   }
 
   if (options.maximum_price_per_night) {
-    queryParams.push(`${options.maximum_price_per_night}`);
+    queryParams.push(`${options.maximum_price_per_night}` * 100);
     queryString += `AND properties.cost_per_night < $${queryParams.length} `;
   }
 
@@ -106,9 +106,6 @@ const getAllProperties = function (options, limit = 10) {
   LIMIT $${queryParams.length};
   `;
 
-  // console.log(queryString, queryParams);
-  // console.log(options)
-
   return pool.query(queryString, queryParams)
     .then(res => res.rows);
 }
@@ -116,5 +113,23 @@ exports.getAllProperties = getAllProperties;
 
 
 const addProperty = function (property) {
+  return pool.query(`
+  INSERT INTO properties (
+    owner_id,
+    title,
+    description,
+    number_of_bedrooms,
+    number_of_bathrooms,
+    parking_spaces,
+    cost_per_night,
+    thumbnail_photo_url,
+    cover_photo_url,
+    street,
+    country,
+    city,
+    province,
+    post_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
+  `, [property.owner_id, property.title, property.description, property.number_of_bedrooms, property.number_of_bathrooms, property.parking_spaces, property.cost_per_night, property.thumbnail_photo_url, property.cover_photo_url, property.street, property.country, property.city, property.province, property.post_code])
+    .then(res => res.rows[0]);
 }
 exports.addProperty = addProperty;
