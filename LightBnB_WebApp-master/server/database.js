@@ -63,13 +63,12 @@ exports.getAllReservations = getAllReservations;
 
 
 const getAllProperties = function (options, limit = 10) {
-  console.log(options)
   const queryParams = [];
 
   let queryString = `
   SELECT properties.*, avg(property_reviews.rating) as average_rating
   FROM properties
-  JOIN property_reviews ON properties.id = property_id
+  LEFT JOIN property_reviews ON properties.id = property_id
   WHERE TRUE
   `;
 
